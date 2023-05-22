@@ -1,0 +1,117 @@
+activity_main
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:padding="16dp">
+
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="MediaPlayer"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textSize="32sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerVertical="true">
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Play"
+            android:onClick="music"/>
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Pause"
+            android:onClick="music"/>
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Stop"
+            android:onClick="music"/>
+    </LinearLayout>
+
+</RelativeLayout>
+
+ACTIVITYMAIN
+
+package com.example.mediaplayer;
+
+import
+        androidx.appcompat.app.AppCompatActivity;
+
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.view.View;
+
+public class MainActivity extends AppCompatActivity {
+    MediaPlayer mediaPlayer;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mediaPlayer=null;
+    }
+
+    public void music(View view) {
+        switch (view.getId()) {
+            case(R.id.button): {
+                if (mediaPlayer == null) {
+                    mediaPlayer = mediaPlayer.create(this, R.raw.music);
+                }
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+                        stopMusic();
+                    }
+                });
+                mediaPlayer.start();
+                break;
+            }
+            case(R.id.button2): {
+                if (mediaPlayer != null) {
+                    mediaPlayer.pause();
+                }
+                break;
+            }
+            case (R.id.button3): {
+                if (mediaPlayer != null) {
+                    mediaPlayer.stop();
+                    stopMusic();
+                }
+                break;
+            }
+        }
+    }
+
+    private void stopMusic() {
+        mediaPlayer.release();
+        mediaPlayer=null;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopMusic();
+    }
+}

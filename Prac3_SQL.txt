@@ -1,0 +1,160 @@
+LOGINACTIVITY
+
+package com.example.myapplication;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+
+public class LoginActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+    }
+}
+
+MAINACTIVITY
+
+public class MainActivity extends AppCompatActivity {
+    private EditText mUsernameEditText;
+    private EditText mPasswordEditText;
+    private Button mLoginButton,registerButton;
+    private SQLiteDatabase mDatabase;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        // Initialize the UI components
+        mUsernameEditText = findViewById(R.id.username);
+        mPasswordEditText = findViewById(R.id.password);
+        mLoginButton = findViewById(R.id.login);
+        registerButton=findViewById(R.id.button2);
+        // Open the database connection
+        mDatabase = openOrCreateDatabase("mydatabase.db", MODE_PRIVATE, null);
+        // Create the users table if it doesn't exist
+        mDatabase.execSQL("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)");
+        // Set the click listener for the login button
+        mLoginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String username = mUsernameEditText.getText().toString();
+                String password = mPasswordEditText.getText().toString();
+                // Query the database for the user with the given username and password
+                Cursor cursor = mDatabase.rawQuery("SELECT * FROM users WHERE username = ? AND password = ?", new String[]{username, password});
+                // Check if the query returned any results
+                if (cursor.getCount() > 0) {
+                    // The user is authenticated, start the main activity
+                    Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    // The user is not authenticated, display an error message
+                    Toast.makeText(MainActivity.this, "Enter valid credentials or User don't exist", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String username = mUsernameEditText.getText().toString();
+                String password = mPasswordEditText.getText().toString();
+
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("username",username);
+                contentValues.put("password",password);
+                Cursor cursor = mDatabase.rawQuery("SELECT * FROM users WHERE username = ? ", new String[]{username});
+                // Check if the query returned any results
+                if (cursor.getCount() > 0) {
+                    Toast.makeText(MainActivity.this, "User already exist!!", Toast.LENGTH_SHORT).show();
+                }else{
+                    long result= mDatabase.insert("users",null,contentValues);
+                    if (result == -1){
+                        Toast.makeText(MainActivity.this, "SomeThing went wrong", Toast.LENGTH_SHORT).show();
+                    }else {
+                        Toast.makeText(MainActivity.this, "User Registered", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+
+    }
+}
+
+
+ACTIVITYLOGIN
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+ACTIVITYMAIN
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/textViewName"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:text="Aryan Bagade"/>
+
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="8dp"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="8dp"
+        android:inputType="textPassword"
+        android:hint="Password"/>
+
+    <Button
+        android:id="@+id/login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="LOGIN"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="8dp"/>
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="8dp"/>
+
+</LinearLayout>
+
+
